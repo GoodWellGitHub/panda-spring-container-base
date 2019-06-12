@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xmlns:rabbit="http://www.springframework.org/schema/rabbit"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context.xsd
+        http://www.springframework.org/schema/util
+        http://www.springframework.org/schema/util/spring-util.xsd
+        http://www.springframework.org/schema/rabbit
+        http://www.springframework.org/schema/rabbit/spring-rabbit.xsd">
+
+    <!--使用外部参数文件application.properties-->
+    <context:property-placeholder location="classpath*:application.properties"></context:property-placeholder>
+    <util:properties id="appConfig" location="classpath*:application.properties"></util:properties>
+
+    <!--连接RabbitMQ服务器-->
+    <rabbit:connection-factory id="connectionFactory" host="${mq.host}" username="${mq.username}"
+                               password="${mq.password}" port="${mq.port}"/>
+    <rabbit:admin connection-factory="connectionFactory"/>
+
+    <!--声明一个RabbitMQTemplate-->
+    <rabbit:template id="amqpTemplate" exchange="${mq.queue}_exchange" connection-factory="connectionFactory"/>
+
+
+    <!--在applicationContext.xml中声明一个交换机-->
+    <rabbit:topic-exchange name="${mq.queue}_exchange" durable="true" auto-delete="false">
+        <rabbit:bindings>
+            <rabbit:binding queue="spring_queue" pattern="${mq.queue}_patt"></rabbit:binding>
+        </rabbit:bindings>
+    </rabbit:topic-exchange>
+
+    <!--在 applicationContext.xml 中声明一个队列durable 是否持久化exclusive 仅创建者可以使用的私有队列，断开后自动删除auto-delete 当所有消费端连接断开后，是否自动删除队列-->
+    <rabbit:queue id="spring_queue" name="${mq.queue}_testQueue" durable="true" auto-delete="false" exclusive="false"/>
+
+    <bean id="producer" class="com.org.wa.hj.rabbitmq.service.Producer">
+        <property name="amqpTemplate" ref="amqpTemplate"/>
+    </bean>
+
+
+    <!--消费者类级别-->
+    <bean id="rabbitmqService" class="com.org.wa.hj.rabbitmq.service.RabbitService"></bean>
+
+    <!--queues 监听队列,多个用逗号分隔ref 监听器-->
+    <!--    <rabbit:listener-container connection-factory="connectionFactory" acknowledge="auto">
+            <rabbit:listener queues="spring_queue" ref="rabbitmqService"></rabbit:listener>
+        </rabbit:listener-container>-->
+
+
+    <!--将消费者由类级别改为方法级别-->
+    <bean id="consumerService" class="com.org.wa.hj.rabbitmq.service.ConsumerService"/>
+
+    <rabbit:listener-container connection-factory="connectionFactory" acknowledge="auto">
+        <!-- queues 监听队列，多个用逗号分隔 ref 监听器 -->
+        <rabbit:listener queues="spring_queue" ref="consumerService" method="getMessage"/>
+    </rabbit:listener-container>
+
+</beans>
