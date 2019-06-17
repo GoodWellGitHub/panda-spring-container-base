@@ -1,5 +1,8 @@
 package com.org.wa.hj.elasticsearch.service;
 
+import com.sun.xml.internal.ws.api.server.Container;
+import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.index.search.MatchQuery;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.domain.Page;
@@ -11,7 +14,10 @@ import org.springframework.util.CollectionUtils;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+
+import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
 
 @Component
 @ComponentScan

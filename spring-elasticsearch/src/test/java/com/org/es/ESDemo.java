@@ -1,6 +1,8 @@
 package com.org.es;
 
+import com.org.wa.hj.elasticsearch.domain.ElasticSetting;
 import com.org.wa.hj.elasticsearch.domain.Paper;
+import com.org.wa.hj.elasticsearch.service.ElasticsearchUtil;
 import com.org.wa.hj.elasticsearch.service.Init;
 import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.index.query.BoolQueryBuilder;
@@ -16,10 +18,7 @@ import org.springframework.data.elasticsearch.core.query.SearchQuery;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 @RunWith(value = SpringJUnit4ClassRunner.class)
 @ContextConfiguration(value = "classpath*:/spring/spring.xml")
@@ -29,6 +28,11 @@ public class ESDemo {
 
     @Autowired(required = false)
     private ElasticsearchTemplate elasticsearchTemplate;
+
+
+    @Autowired
+    private ElasticsearchUtil elasticsearchUtil;
+
 
     @Test
     public void demo() {
@@ -93,5 +97,20 @@ public class ESDemo {
 
         //     System.out.println(papers);
 
+    }
+
+    @Test
+    public void esDemo() {
+        ElasticSetting elasticSetting = new ElasticSetting();
+        //IndexQuery indexQuery = new IndexQueryBuilder().withIndexName("setting").withType("setting_type").withId("1").withObject(new ElasticSetting()).build();
+        //elasticsearchTemplate.index(indexQuery);
+        //boolean exis = elasticsearchTemplate.indexExists("setting");
+       // boolean is = elasticsearchTemplate.deleteIndex("setting");
+        Map<String, Integer> set = new HashMap<>();
+        set.put("number_of_shards", 3);
+        set.put("number_of_replicas",2);
+        elasticsearchTemplate.createIndex("setting", set);
+        //Map map = elasticsearchTemplate.getSetting("setting");
+        //       System.out.println(map.toString());
     }
 }

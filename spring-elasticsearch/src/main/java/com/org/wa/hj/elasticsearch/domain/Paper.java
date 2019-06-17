@@ -11,7 +11,7 @@ import org.springframework.data.elasticsearch.annotations.Document;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Document(indexName = "paper", type = "spring-paper", indexStoreType = "fs", shards = 3, replicas = 1, refreshInterval = "-1")
+@Document(indexName = "paper", type = "spring-paper", indexStoreType = "fs", shards = 3, replicas = 2)
 public class Paper {
     @Id
     private String id;
@@ -23,4 +23,5 @@ public class Paper {
     private int userId;
 
     private int weight;
+
 }

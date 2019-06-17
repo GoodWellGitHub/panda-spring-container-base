@@ -19,4 +19,5 @@ http://www.springframework.org/schema/data/elasticsearch/spring-elasticsearch.xs
           class="org.springframework.data.elasticsearch.core.ElasticsearchTemplate">
         <constructor-arg ref="client"/>
     </bean>
+
 </beans>
