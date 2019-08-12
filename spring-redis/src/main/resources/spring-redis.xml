@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+    <context:annotation-config></context:annotation-config>
+    <context:component-scan base-package="com.org.wa.hj.redis"/>
+    <bean id="redisTemplate" class="org.springframework.data.redis.core.RedisTemplate">
+        <property name="connectionFactory" ref="redisConnectionFactory"/>
+    </bean>
+
+    <bean id="stringRedisTemplate" class="org.springframework.data.redis.core.StringRedisTemplate">
+        <property name="connectionFactory" ref="redisConnectionFactory"/>
+    </bean>
+
+    <bean id="jedisPoolConfig" class="redis.clients.jedis.JedisPoolConfig">
+        <property name="maxIdle" value="1"/>
+        <property name="maxTotal" value="5"/>
+        <property name="blockWhenExhausted" value="true"/>
+        <property name="maxWaitMillis" value="30000"/>
+        <property name="testOnBorrow" value="true"/>
+        <property name="minEvictableIdleTimeMillis" value="3000"/>
+    </bean>
+
+    <bean id="redisConnectionFactory" class="org.springframework.data.redis.connection.jedis.JedisConnectionFactory">
+        <constructor-arg name="clusterConfig" ref="redisClusterConfiguration"></constructor-arg>
+        <constructor-arg name="poolConfig" ref="jedisPoolConfig"></constructor-arg>
+    </bean>
+
+    <bean id="redisClusterConfiguration" class="org.springframework.data.redis.connection.RedisClusterConfiguration">
+        <property name="maxRedirects" value="1">
+        </property>
+        <property name="clusterNodes">
+            <set>
+                <bean class="org.springframework.data.redis.connection.RedisNode">
+                    <constructor-arg name="host" value="${redis.host}"></constructor-arg>
+                    <constructor-arg name="port" value="${redis.port7000}"></constructor-arg>
+                </bean>
+<!--                <bean class="org.springframework.data.redis.connection.RedisNode">
+                    <constructor-arg name="host" value="${redis.host}"></constructor-arg>
+                    <constructor-arg name="port" value="${redis.port7001}"></constructor-arg>
+                </bean>
+                <bean class="org.springframework.data.redis.connection.RedisNode">
+                    <constructor-arg name="host" value="${redis.host}"></constructor-arg>
+                    <constructor-arg name="port" value="${redis.port7002}"></constructor-arg>
+                </bean>-->
+            </set>
+        </property>
+        <property name="password" value="${redis.password}"></property>
+    </bean>
+
+    <bean id="propertyFileConfigForDB" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+        <property name="location">
+            <value>application.properties</value>
+        </property>
+    </bean>
+
+
+</beans>
